@@ -1,4 +1,5 @@
 require 'debugger'
+require_relative 'queue.rb'
 module Maze 
  def self.load(file) 
     maze = {}
@@ -39,10 +40,10 @@ module Maze
  
   class Solver
  
-    def initialize(maze,show_progress=false)
+    def initialize(maze,show_progress=false,queue = Queue.new)
       @maze = maze
       @show_progress = show_progress
-      @queue = [] #replace with an object
+      @queue = queue
       @exit_found = false
     end
  
@@ -69,7 +70,7 @@ module Maze
         else
           set_node_as_visited(x,y)  # Mark path as visited
           print if @show_progress
-          add_open_neighbors_to_queue(queue,x,y)
+          add_open_neighbors_to_queue(queue,x,y,sqr)
         end
       end
  
@@ -92,7 +93,7 @@ module Maze
  
 private 
  
-    def add_open_elements_to_queue(queue,x,y)
+    def add_open_neighbors_to_queue(queue,x,y,sqr)
       queue << Sqr.new(x+1,y,sqr) if open_square(x+1,y,matrix)
       queue << Sqr.new(x-1,y,sqr) if open_square(x-1,y,matrix)
       queue << Sqr.new(x,y+1,sqr) if open_square(x,y+1,matrix)
@@ -147,9 +148,9 @@ private
     end
 
   end
- 
+
 end
 
-maze = Maze.load('./maze.txt')
-maze_solver = Maze::Solver.new(maze,true)
-maze_solver.solve
+# maze = Maze.load('./maze.txt')
+# maze_solver = Maze::Solver.new(maze,true)
+# maze_solver.solve
