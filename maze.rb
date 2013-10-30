@@ -65,7 +65,7 @@ module Maze
         sqr = queue.shift  # queue.pop
         x = sqr.x
         y = sqr.y
-        if (x == @maze[:exit_x] && y == @maze[:exit_y])
+        if (x == maze_exit_x && y == maze_exit_y)
           exit_found = true
         else
           matrix[y][x] = '-'  # Mark path as visited
@@ -107,6 +107,14 @@ module Maze
       end
     end
 
+    def maze_exit_x
+      @maze[:exit_x]
+    end
+
+    def maze_exit_y
+      @maze[:exit_y]
+    end
+
     def queue
       @queue
     end
@@ -125,6 +133,10 @@ module Maze
     
     def exit_found
       @exit_found
+    end
+
+    def exit_found=(val)
+      @exit_found = val
     end
   end
  
