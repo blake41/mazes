@@ -43,6 +43,7 @@ module Maze
       @maze = maze
       @show_progress = show_progress
       @queue = [] #replace with an object
+      @exit_found = false
     end
  
     def print
@@ -54,7 +55,6 @@ module Maze
 
     # Main BFS algorithm.
     def solve
-      exit_found = false
  
       sqr = Sqr.new(@maze[:entrance_x], @maze[:entrance_y], nil)
  
@@ -65,7 +65,7 @@ module Maze
         x = sqr.x
         y = sqr.y
         if (x == maze_exit_x && y == maze_exit_y)
-          exit_found = true
+          mark_exit_found
         else
           set_node_as_visited(x,y)  # Mark path as visited
           print if @show_progress
@@ -93,7 +93,7 @@ module Maze
       end
     end
  
-    private 
+private 
  
     def open_square(x,y,matrix)
       return false if (x<0 || x>matrix[0].size-1 || y<0 || y>matrix.size-1) 
@@ -130,21 +130,18 @@ module Maze
       !@queue.empty?
     end
 
-    def queue_full
-      
-    end
-
     def exit_not_found
       !@exit_found
     end
-    
+
     def exit_found
       @exit_found
     end
 
-    def exit_found=(val)
-      @exit_found = val
+    def mark_exit_found
+      @exit_found = true
     end
+
   end
  
 end
