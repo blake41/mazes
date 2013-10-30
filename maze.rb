@@ -1,4 +1,3 @@
-require 'debugger'
 require_relative 'my_queue.rb'
 module Maze 
  def self.load(file) 
@@ -62,29 +61,38 @@ module Maze
     # Main BFS algorithm.
     def solve
  
-      sqr = Sqr.new(@maze[:entrance_x], @maze[:entrance_y], nil)
- 
-      queue << sqr
- 
-      while queue_present? && exit_not_found
-        sqr = queue.shift  # queue.pop
-        x = sqr.x
-        y = sqr.y
-        if (x == maze_exit_x && y == maze_exit_y)
-          mark_exit_found
-        else
-          change_last_visited_node
-          set_node_as_head(sqr)
-          print
-          mark_last_visited_node(sqr)
-          add_open_neighbors_to_queue(queue,x,y,sqr)
-        end
-      end
+      walk_maze
  
       # Clear all pathway markers
       clear_matrix
  
+      paint_correct_path
+    end
+ 
+private 
+
+    def walk_maze
+      @current_sqr = Sqr.new(@maze[:entrance_x], @maze[:entrance_y], nil)
+      
+      queue << @current_sqr
+      
+      while queue_present? && exit_not_found
+        @current_sqr = queue.shift  # queue.pop
+        if (@current_sqr.x == maze_exit_x && @current_sqr.y == maze_exit_y)
+          mark_exit_found
+        else
+          change_last_visited_node
+          set_node_as_head
+          print
+          mark_last_visited_node
+          add_open_neighbors_to_queue
+        end
+      end
+    end
+
+    def paint_correct_path
       if exit_found
+        sqr = @current_sqr
         # Repaint solution pathway with markers
         matrix[sqr.y][sqr.x] = '>'
         while sqr.parent
@@ -93,18 +101,18 @@ module Maze
         end
         puts "Maze solved:\n\n"
         print
-        else
-          puts 'No exit found'
+      else
+        puts 'No exit found'
       end
     end
- 
-private 
 
-    def add_open_neighbors_to_queue(queue,x,y,sqr)
-      queue << Sqr.new(x+1,y,sqr) if open_square(x+1,y,matrix)
-      queue << Sqr.new(x-1,y,sqr) if open_square(x-1,y,matrix)
-      queue << Sqr.new(x,y+1,sqr) if open_square(x,y+1,matrix)
-      queue << Sqr.new(x,y-1,sqr) if open_square(x,y-1,matrix)
+    def add_open_neighbors_to_queue
+      x = @current_sqr.x
+      y = @current_sqr.y
+      queue << Sqr.new(x+1,y,@current_sqr) if open_square(x+1,y,matrix)
+      queue << Sqr.new(x-1,y,@current_sqr) if open_square(x-1,y,matrix)
+      queue << Sqr.new(x,y+1,@current_sqr) if open_square(x,y+1,matrix)
+      queue << Sqr.new(x,y-1,@current_sqr) if open_square(x,y-1,matrix)
     end
 
     def open_square(x,y,matrix)
@@ -126,12 +134,12 @@ private
       matrix[sqr.y][sqr.x] = mark
     end
 
-    def set_node_as_head(sqr)
-      set_node_as_visited(sqr, "o")
+    def set_node_as_head
+      set_node_as_visited(@current_sqr, "o")
     end
 
-    def mark_last_visited_node(sqr)
-      @last_visited_node = sqr
+    def mark_last_visited_node
+      @last_visited_node = @current_sqr
     end
 
     def change_last_visited_node
