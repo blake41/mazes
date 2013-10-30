@@ -42,7 +42,7 @@ module Maze
     def initialize(maze,show_progress=false)
       @maze = maze
       @show_progress = show_progress
-      @queue = []
+      @queue = [] #replace with an object
     end
  
     def print
@@ -54,7 +54,6 @@ module Maze
 
     # Main BFS algorithm.
     def solve
-      matrix = @maze[:matrix]
       exit_found = false
  
       sqr = Sqr.new(@maze[:entrance_x], @maze[:entrance_y], nil)
@@ -68,7 +67,7 @@ module Maze
         if (x == maze_exit_x && y == maze_exit_y)
           exit_found = true
         else
-          matrix[y][x] = '-'  # Mark path as visited
+          set_node_as_visited(x,y)  # Mark path as visited
           print if @show_progress
           queue << Sqr.new(x+1,y,sqr) if open_square(x+1,y,matrix)
           queue << Sqr.new(x-1,y,sqr) if open_square(x-1,y,matrix)
@@ -85,7 +84,7 @@ module Maze
         matrix[sqr.y][sqr.x] = '>'
         while sqr.parent
           sqr = sqr.parent
-          matrix[sqr.y][sqr.x] = '-'
+          matrix[sqr.y][sqr.x] = '+'
         end
         puts "Maze solved:\n\n"
         print
@@ -102,9 +101,17 @@ module Maze
     end
  
     def clear_matrix
-      @maze[:matrix].each_index do |idx|
-        @maze[:matrix][idx] = @maze[:matrix][idx].join.gsub(/[^#|\s]/i,' ').split(//)
+      matrix.each_index do |idx|
+        matrix[idx] = matrix[idx].join.gsub(/[^#|\s]/i,' ').split(//)
       end
+    end
+
+    def matrix
+      @maze[:matrix]
+    end
+
+    def set_node_as_visited(x,y)
+      matrix[y][x] = '+'
     end
 
     def maze_exit_x
