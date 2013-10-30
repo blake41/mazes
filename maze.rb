@@ -69,10 +69,7 @@ module Maze
         else
           set_node_as_visited(x,y)  # Mark path as visited
           print if @show_progress
-          queue << Sqr.new(x+1,y,sqr) if open_square(x+1,y,matrix)
-          queue << Sqr.new(x-1,y,sqr) if open_square(x-1,y,matrix)
-          queue << Sqr.new(x,y+1,sqr) if open_square(x,y+1,matrix)
-          queue << Sqr.new(x,y-1,sqr) if open_square(x,y-1,matrix)
+          add_open_neighbors_to_queue(queue,x,y)
         end
       end
  
@@ -95,6 +92,13 @@ module Maze
  
 private 
  
+    def add_open_elements_to_queue(queue,x,y)
+      queue << Sqr.new(x+1,y,sqr) if open_square(x+1,y,matrix)
+      queue << Sqr.new(x-1,y,sqr) if open_square(x-1,y,matrix)
+      queue << Sqr.new(x,y+1,sqr) if open_square(x,y+1,matrix)
+      queue << Sqr.new(x,y-1,sqr) if open_square(x,y-1,matrix)
+    end
+
     def open_square(x,y,matrix)
       return false if (x<0 || x>matrix[0].size-1 || y<0 || y>matrix.size-1) 
       return matrix[y][x] == ' '
