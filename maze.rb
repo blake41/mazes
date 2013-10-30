@@ -1,5 +1,5 @@
 require 'debugger'
-require_relative 'queue.rb'
+require_relative 'my_queue.rb'
 module Maze 
  def self.load(file) 
     maze = {}
@@ -40,7 +40,7 @@ module Maze
  
   class Solver
  
-    def initialize(maze,show_progress=false,queue = Queue.new)
+    def initialize(maze,show_progress=false,queue = MyQueue.new)
       @maze = maze
       @show_progress = show_progress
       @queue = queue
@@ -48,10 +48,15 @@ module Maze
     end
  
     def print
-      @maze[:matrix].each do |line|
-        puts line.join
+      if @show_progress
+        puts "State of the queue"
+        puts queue.print
+        puts "State of the maze"
+        @maze[:matrix].each do |line|
+          puts line.join
+        end
+        puts
       end
-      puts
     end
 
     # Main BFS algorithm.
@@ -68,8 +73,10 @@ module Maze
         if (x == maze_exit_x && y == maze_exit_y)
           mark_exit_found
         else
-          set_node_as_visited(x,y)  # Mark path as visited
-          print if @show_progress
+          change_last_visited_node
+          set_node_as_head(sqr)
+          print
+          mark_last_visited_node(sqr)
           add_open_neighbors_to_queue(queue,x,y,sqr)
         end
       end
@@ -92,7 +99,7 @@ module Maze
     end
  
 private 
- 
+
     def add_open_neighbors_to_queue(queue,x,y,sqr)
       queue << Sqr.new(x+1,y,sqr) if open_square(x+1,y,matrix)
       queue << Sqr.new(x-1,y,sqr) if open_square(x-1,y,matrix)
@@ -115,8 +122,22 @@ private
       @maze[:matrix]
     end
 
-    def set_node_as_visited(x,y)
-      matrix[y][x] = '+'
+    def set_node_as_visited(sqr, mark)
+      matrix[sqr.y][sqr.x] = mark
+    end
+
+    def set_node_as_head(sqr)
+      set_node_as_visited(sqr, "o")
+    end
+
+    def mark_last_visited_node(sqr)
+      @last_visited_node = sqr
+    end
+
+    def change_last_visited_node
+      unless @last_visited_node.nil?
+        set_node_as_visited(@last_visited_node, "+")
+      end
     end
 
     def maze_exit_x
@@ -132,7 +153,7 @@ private
     end
 
     def queue_present?
-      !@queue.empty?
+      queue.present?
     end
 
     def exit_not_found
@@ -151,6 +172,6 @@ private
 
 end
 
-# maze = Maze.load('./maze.txt')
-# maze_solver = Maze::Solver.new(maze,true)
-# maze_solver.solve
+maze = Maze.load('./maze.txt')
+maze_solver = Maze::Solver.new(maze,true)
+maze_solver.solve
