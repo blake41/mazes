@@ -22,13 +22,9 @@ module Maze
     maze[:entrance_x] = 0
     maze[:exit_x]     = matrix[0].size-1
     matrix.each_index do |idx|
-      maze[:entrance_y] = idx if matrix[idx][0]==' ' 
-      maze[:exit_y]     = idx if matrix[idx][matrix[0].size-1]==' ' 
+      maze[:entrance_y] = idx if matrix[idx][0]=='→' 
+      maze[:exit_y]     = idx if matrix[idx][matrix[0].size-1]=='@' 
     end
-    err = <<-ERROR 
-      Exits must be on the left and right side of the maze
-    ERROR
-    raise err unless maze.size == 5
   end
  
   # Square to hold an x,y square during maze traversal, with
@@ -117,7 +113,7 @@ private
 
     def open_square(x,y,matrix)
       return false if (x<0 || x>matrix[0].size-1 || y<0 || y>matrix.size-1) 
-      return matrix[y][x] == ' '
+      return matrix[y][x] == ' ' || matrix[y][x] == "@"
     end
  
     def clear_matrix
